@@ -5,14 +5,14 @@ import { UserEntity } from './user.entity';
 export class UserRepository {
   private users: UserEntity[] = [];
 
-  save(user: UserEntity) {
-    this.users.push(user);
+  save(data: UserEntity) {
+    this.users.push(data);
   }
 
-  update(id: string, updateData: Partial<UserEntity>) {
+  update(id: string, data: Partial<UserEntity>) {
     const user = this.findById(id);
 
-    Object.entries(updateData).forEach(([key, value]) => {
+    Object.entries(data).forEach(([key, value]) => {
       if (key === 'id') return;
 
       user[key] = value;
