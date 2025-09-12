@@ -1,16 +1,16 @@
-import { Type } from 'class-transformer';
+// import { Type } from 'class-transformer'; - Não vai usar, pode remover ou manter comentado
 import {
-  ArrayMinSize,
-  IsArray,
+  // ArrayMinSize, - Não vai usar, pode remover ou manter comentado
+  // IsArray, - Não vai usar, pode remover ou manter comentado
+  // ValidateNested, - Não vai usar, pode remover ou manter comentado
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   IsUUID,
   Min,
-  ValidateNested,
 } from 'class-validator';
-import { ProductFeatureDTO, ProductImageDTO } from './create-product.dto';
+// import { ProductFeatureDTO, ProductImageDTO } from './create-product.dto'; - Não vai usar, pode remover ou manter comentado
 
 export class UpdateProductDTO {
   @IsUUID()
@@ -33,25 +33,27 @@ export class UpdateProductDTO {
   @IsNumber()
   @Min(0)
   @IsOptional()
-  amountAvailable: number;
+  amount: number;
 
   @IsString()
   @IsOptional()
   description: string;
 
-  @ValidateNested()
-  @IsArray()
-  @ArrayMinSize(3)
-  @Type(() => ProductFeatureDTO)
-  @IsOptional()
-  features: ProductFeatureDTO[];
+  // - Não vai usar, pode remover ou manter comentado
+  // @ValidateNested()
+  // @IsArray()
+  // @ArrayMinSize(3)
+  // @Type(() => ProductFeatureDTO)
+  // @IsOptional()
+  // features: ProductFeatureDTO[];
 
-  @ValidateNested()
-  @IsArray()
-  @ArrayMinSize(1)
-  @Type(() => ProductImageDTO)
-  @IsOptional()
-  images: ProductImageDTO[];
+  // - Não vai usar, pode remover ou manter comentado
+  // @ValidateNested()
+  // @IsArray()
+  // @ArrayMinSize(1)
+  // @Type(() => ProductImageDTO)
+  // @IsOptional()
+  // images: ProductImageDTO[];
 
   @IsString()
   @IsNotEmpty()

@@ -7,41 +7,61 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { randomUUID } from 'crypto';
-
 import { UpdateProductDTO } from './dto/update-product.dto';
 import { CreateProductDTO } from './dto/create-product.dto';
 import { ProductEntity } from './product.entity';
 import { ProductRepository } from './product.repository';
+import { ProductService } from './product.service';
+import { ProductImageEntity } from './product-image.entity';
+import { ProductFeatureEntity } from './product-feature.entity';
 
 @Controller('products')
 export class ProductController {
-  constructor(private readonly productRepository: ProductRepository) {}
+  constructor(
+    private readonly productRepository: ProductRepository,
+    private readonly productService: ProductService
+  ) {}
 
   @Post()
   async createProduct(@Body() data: CreateProductDTO) {
     const productEntity = new ProductEntity();
 
-    productEntity.id = randomUUID();
     productEntity.name = data.name;
     productEntity.userId = data.userId;
     productEntity.value = data.value;
     productEntity.amount = data.amount;
     productEntity.description = data.description;
     productEntity.category = data.category;
-    productEntity.features = data.features;
-    productEntity.images = data.images;
+    productEntity.features = data.features.map(featureDto => {
+      const feature = new ProductFeatureEntity();
+      feature.name = featureDto.name;
+      feature.description = featureDto.description;
 
-    const product = this.productRepository.save(productEntity);
+      return feature;
+    });
+
+    productEntity.images = data.images.map(imgDto => {
+      const image = new ProductImageEntity();
+      image.url = imgDto.url;
+      image.description = imgDto.description;
+
+      return image;
+    });
+
+    await this.productService.createProduct(productEntity);
+
     return {
-      product,
       message: 'Product was created'
     };
   }
 
   @Get()
-  async listProduct() {
-    return this.productRepository.findMany();
+  async getAllProducts() {
+    const products = await this.productService.getAllProducts()
+    return {
+      products,
+      message: null
+    }
   }
 
   @Put('/:id')
@@ -49,23 +69,18 @@ export class ProductController {
     @Param('id') id: string,
     @Body() data: UpdateProductDTO,
   ) {
-    const product = await this.productRepository.update(
-      id,
-      data,
-    );
+    await this.productService.updateProduct(id, data);
 
     return {
-      product,
       message: 'Product was updated'
     };
   }
 
   @Delete('/:id')
   async deleteProduct(@Param('id') id: string) {
-    const product = await this.productRepository.delete(id);
+    await this.productService.deleteProduct(id);
 
     return {
-      product,
       message: 'Product was deleted'
     };
   }

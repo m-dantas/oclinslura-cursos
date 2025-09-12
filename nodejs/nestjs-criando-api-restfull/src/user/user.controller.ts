@@ -7,59 +7,55 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { UserRepository } from './user.repository';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UserEntity } from './user.entity';
-import { randomUUID } from 'crypto';
-import { ListUserDTO } from './dto/list-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { UserService } from './user.service';
 
 @Controller('/users')
 export class UserController {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private readonly userService: UserService
+  ) {}
 
   @Post()
-  createUser(@Body() userData: CreateUserDTO) {
+  async createUser(@Body() userData: CreateUserDTO) {
     const userEntity = new UserEntity();
-    userEntity.id = randomUUID();
     userEntity.name = userData.name;
     userEntity.email = userData.email;
     userEntity.password = userData.password;
 
-    this.userRepository.save(userEntity);
+    await this.userService.createUser(userEntity);
 
     return {
-      user: new ListUserDTO(userEntity.id, userEntity.name),
       message: 'User was created',
     };
   }
 
   @Get()
-  listUser() {
-    const users = this.userRepository.findMany();
-    const userWithOutSensiveData = users.map(
-      (user) => new ListUserDTO(user.id, user.name),
-    );
+  async getAllUsers() {
+    const users = await this.userService.getAllUsers();
 
-    return userWithOutSensiveData;
+    return {
+      users,
+      message: null
+    };
   }
 
   @Put('/:id')
-  updateUser(@Param('id') id: string, @Body() updateData: UpdateUserDTO) {
-    const user = this.userRepository.update(id, updateData);
+  async updateUser(@Param('id') id: string, @Body() updateData: UpdateUserDTO) {
+    await this.userService.updateUser(id, updateData);
 
     return {
-      user,
       message: 'User was updated',
     };
   }
 
   @Delete('/:id')
-  deleteUser(@Param('id') id: string) {
-    const user = this.userRepository.delete(id);
+  async deleteUser(@Param('id') id: string) {
+    await this.userService.deleteUser(id)
 
     return {
-      user: new ListUserDTO(user.id, user.name),
       message: 'User was deleted',
     };
   }
